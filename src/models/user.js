@@ -60,7 +60,11 @@ const userSchema = new mongoose.Schema(
             
         }
     
-    }
+    },
+     // enable timestamps to track Created At and Updated At
+        {
+            timestamps: true
+        }
 
 )
 

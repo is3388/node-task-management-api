@@ -68,23 +68,23 @@ app.listen(port, () =>
         console.log(data)
     }
     myFunction()*/
-    // example
+    /* example
     const Task = require('./models/task')
     const User = require('./models/user')
 
     const main = async () =>
     {
-       /*const task = await Task.findById('61afe6b69d01f9bd4ba041f3')
+      const task = await Task.findById('61afe6b69d01f9bd4ba041f3')
 
         // find the user associated with the task. The task owner will now be the profile or the entire document 
         // not only the ID
         await task.populate('owner')
         console.log(task)
-        console.log(task.owner)*/
+        console.log(task.owner)
         const user = await User.findById('61b0c8f7b9eaf9aae2a0c63d')// tim
         await user.populate('tasks') // populate is Mongoose provided
         console.log(user.tasks)
     }
 
-    main()
+    main()*/
     

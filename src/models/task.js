@@ -1,16 +1,18 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 
-
-// define a  model name Task with 2 fields
-const Task = mongoose.model('Task', 
-{
-    description: { type: String, required: true, trim: true },
-    completed: { type: Boolean, default: false}, 
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User'} // create relationship between User model and this field
-
-
-})
+// define a task Schema
+const taskSchema = new mongoose.Schema(
+    {
+        description: { type: String, required: true, trim: true },
+        completed: { type: Boolean, default: false}, 
+        owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User'} // create relationship between User model and this field
+        
+        
+    }, { timestamps: true } // enable timestamps to track CreatedAt and UpdatedAt
+    )
+// define a  model name Task 
+const Task = mongoose.model('Task', taskSchema)
 
 
 /*const task = new Task(
