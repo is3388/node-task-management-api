@@ -49,13 +49,40 @@ router.get('/tasks', (req, res)=>
         })
 })*/
 
+// GET/tasks?completed=true or false 
+// GET/tasks?limit=10&skip=0 10 task to be fetched and 1st page because skip is 0. skip 10 will be 2nd page
+// GET/tasks?createdAt:asc 1st part is the field to be sorted, 2nd part is sort order
+// asc is 1, desc is -1 can use : or _ as separator 
 router.get('/tasks', auth, async (req, res)=>
 {
+    const match = {} // create an empty object 
+    
+    if ( req.query.completed )
+    {
+        match.completed = req.query.completed === 'true' // query is string but match is boolean
+    }
+
+    const sort = {}
+
+    if ( req.query.sortBy )
+    {    // break up the value of sortBy
+        const parts = req.query.sortBy.split(':')
+        // parts[0] is the field to be sorted,order is either desc is -1 and asc is 1
+        sort[parts[0]] = parts[1] === 'desc'? -1 : 1 
+    }
     try {
-           const tasks = await Task.find({ owner: req.user._id})
+           //const tasks = await Task.find({ owner: req.user._id})
            // alternative way await req.user.populate('tasks')
-        
-            res.send(tasks) // res.send(req.user.tasks)
+            await req.user.populate({
+             path: 'tasks',
+             match: match,
+             options: { limit: parseInt(req.query.limit),
+                        skip: parseInt(req.query.skip),
+                        sort: sort
+                    } // options for pagination or sorting and limit to no. of task
+            })
+            //res.send(tasks) 
+             res.send(req.user.tasks)
         }
         catch(error)
         {
