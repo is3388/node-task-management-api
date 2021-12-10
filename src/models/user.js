@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema(
         tokens: [{ //array of token objects
             token: { type: String, required: true}
         }],
+        avatar: { type: Buffer }, // to store binary image of user profile
         email: {
             type: String,
             unique: true, // DB will create an index 
@@ -77,7 +78,7 @@ userSchema.methods.toJSON = function ()
     const user = this
     //return only raw object with user data no password and tokens array, using Mongoose method to get it done
     const userObject = user.toObject()
-    delete userObject.password
+    delete userObject.password // delete the user's password and tokens fields
     delete userObject.tokens
     console.log(userObject)
     return userObject

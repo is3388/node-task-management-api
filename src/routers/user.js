@@ -1,6 +1,7 @@
 const express = require('express')
 const User = require('../models/user')
 const auth = require('../middleware/auth')
+const multer = require('multer')
 const router = new express.Router() //create a new router
 
 
@@ -229,6 +230,58 @@ router.delete('/users/me', auth, async ( req, res ) =>
     }
     catch(e)
     {
+        res.status(500).send()
+    }
+})
+
+// upload user profile
+// configure multer to accept what types of file. It could create multiple instances for each type.
+const upload = multer({ //dest: 'avatars', // we want to save it in user profile (DB) not in file system
+limits: { fileSize: 1000000 }, // max size of the file 
+fileFilter( req, file, cb ) // req being made, uploaded file info, callback function
+{
+    //if( !file.originalname.endsWith('.pdf')) // originalname is the info of File object multer provided
+    // which is the file on your PC
+    if ( !file.originalname.match(/\.(jpg|png|jpeg)$/))
+    {
+        return cb(new Error('Please upload an image'))
+    }
+    cb(undefined, true) // call callback with no error and work as expected is true
+}
+}) // create an instance of multer and the destination folder
+// that all uploaded files will be stored
+// set up endpoint that user can upload files
+// 1st arg is the path, 2nd arg is auth middleware to authenticate the user before
+// handle upload, 3nd arg is a multer middleware call single passing the filename (the key in postman) you want to
+// upload 
+// if upload more than one buffer eg one for image and one for resume:
+/* instead of upload.single('avatar') upload.fields([
+    { name: 'avatar', maxCount: 1 }, 
+    { name: 'resume', maxCount: 1 }
+])*/
+router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) =>
+{
+    // pass the upload data to the callback function, so access the file.buffer and 
+    // save it to associated user's avatar field in database
+    req.user.avatar = req.file.buffer
+    await req.user.save()
+    res.send()
+}, (error, req, res, next) =>
+{
+    res.status(400).send({error: error.message}) // the error message from multer which is Please upload an image
+})
+
+// delete an image profile 
+router.delete('/users/me/avatar', auth, async (req, res) => {
+    if (!req.user.avatar) // no image stored in user's avatar field 
+    {
+        res.status(400).send('No avatar to delete!')
+    }
+    try {
+        req.user.avatar = undefined // assign undefined to remove the value but the field is still in db 
+        await req.user.save()
+        res.send()
+    } catch (e) {
         res.status(500).send()
     }
 })

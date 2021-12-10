@@ -87,4 +87,65 @@ app.listen(port, () =>
     }
 
     main()*/
+ // file upload example
+    const multer = require('multer')
+    // configure multer to accept what types of file. It could create multiple instances for each type.
+    const upload = multer( {
+        dest: 'images', // images is the name of the folder created that all uploaded files will be stored
+        limits: { fileSize: 1000000 }, // max size of the file 
+        fileFilter( req, file, cb ) // req being made, uploaded file info, callback function
+        {
+            //if( !file.originalname.endsWith('.pdf')) // originalname is the info of File object multer provided
+            // which is the file on your PC
+            if ( !file.originalname.match(/\.(doc|docx)$/))
+            {
+                return cb(new Error('Please upload a Word document'))
+            }
+            cb(undefined, true) // call callback with no error and work as expected is true
+        }
+
+    }) 
+    // set up endpoint that user can upload files
+    // 1st arg is the path, 2nd arg is a multer middleware call single passing the filename you want to
+    // upload 
+   /* app.post('/upload', upload.single('upload'), (req, res) =>
+    {
+      res.send()  
+    }
+    )*/
+
+    /* example of using middleware for Express to show appropriate error message when file upload fails
+    
+       const errorMiddleware = ( req, res, next ) =>
+    {
+        // every time throw a new error
+        throw new Error('From my middleware')
+    } */
+    // route handler only runs when thing goes well, so we need a callback to handle error
+    app.post('/upload', upload.single('upload'), ( req, res ) =>
+    {
+        res.send()
+    }, (error, req, res, next) =>
+    {
+        res.status(400).send({error: error.message}) // the error message from multer which is Please upload a Word document
+    })
+
+    
+ /*  const avatarUpload = profileUpload.single('avatar')
+ 
+router.post("/users/me/avatar", (req, res) => {
+    avatarUpload(err, req, res => {
+        if(err) {
+            return res.status(400).send({error: err.message})
+        }
+        if(!req.file) {
+            return res.status(400).send({error: 'Please provide a image'})
+            return res.status(422).joson({ message: 'A file is required' })
+        }
+        res.send()  
+    }) 
+})*/
+
+
+
     
