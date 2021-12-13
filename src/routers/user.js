@@ -1,7 +1,8 @@
 const express = require('express')
 const User = require('../models/user')
-const auth = require('../middleware/auth')
-const multer = require('multer')
+const auth = require('../middleware/auth') //function for authentication
+const multer = require('multer') //upload file
+const sharp = require('sharp') //resize and convert image
 const router = new express.Router() //create a new router
 
 
@@ -248,8 +249,7 @@ fileFilter( req, file, cb ) // req being made, uploaded file info, callback func
     }
     cb(undefined, true) // call callback with no error and work as expected is true
 }
-}) // create an instance of multer and the destination folder
-// that all uploaded files will be stored
+}) 
 // set up endpoint that user can upload files
 // 1st arg is the path, 2nd arg is auth middleware to authenticate the user before
 // handle upload, 3nd arg is a multer middleware call single passing the filename (the key in postman) you want to
@@ -263,7 +263,11 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) 
 {
     // pass the upload data to the callback function, so access the file.buffer and 
     // save it to associated user's avatar field in database
-    req.user.avatar = req.file.buffer
+    // before saving the file, we use sharp to resize and convert to png 
+    // you can futher fine tune the image using css
+    //req.user.avatar = req.file.buffer
+    const buffer = await sharp(req.file.buffer).resize({width: 250, height: 250}).png().toBuffer()
+    req.user.avatar = buffer
     await req.user.save()
     res.send()
 }, (error, req, res, next) =>
@@ -283,6 +287,27 @@ router.delete('/users/me/avatar', auth, async (req, res) => {
         res.send()
     } catch (e) {
         res.status(500).send()
+    }
+})
+
+// fetch user profile image by set up URL (img tag) to serve the image up.
+router.get('/users/:id/avatar', async (req, res) =>
+{
+    try
+    {
+        const user = await User.findById(req.params.id)
+        if(!user || !user.avatar)
+        {
+            throw new Error()
+        }
+        // by default Express set the value of response header of Content-Type to application/json
+        res.set('Content-Type', 'image/png') // 'application/json'
+        res.send(user.avatar) // actually send the data
+        // client can get the image by accessing the path
+    }
+    catch(e)
+    {
+        res.status(404).send()
     }
 })
 

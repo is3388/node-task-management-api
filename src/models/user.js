@@ -80,6 +80,7 @@ userSchema.methods.toJSON = function ()
     const userObject = user.toObject()
     delete userObject.password // delete the user's password and tokens fields
     delete userObject.tokens
+    delete userObject.avatar // image too big will slow down JSOn based request
     console.log(userObject)
     return userObject
 }
