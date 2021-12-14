@@ -99,7 +99,7 @@ userSchema.methods.generateAuthToken = async function ()
     const user = this
     console.log(user._id)
     console.log(user.id)
-    const token = jwt.sign({_id: user.id.toString()}, 'thisisagreatcourse')
+    const token = jwt.sign({_id: user.id.toString()}, process.env.JWT_SECRET)
     // add newly generated token to the tokens array which belong to this specific user iand save it to DB. 
     user.tokens = user.tokens.concat({token: token})
     await user.save()
@@ -151,7 +151,7 @@ userSchema.pre('save', async function(next)
 userSchema.pre('remove', async function(next)
 {
     const user = this
-    await Task.deleteAll({owner: user._id})
+    await Task.deleteMany({owner: user._id})
     next()
 })
 const User = mongoose.model('User', userSchema)

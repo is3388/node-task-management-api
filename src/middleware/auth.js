@@ -9,7 +9,7 @@ const auth = async (req, res, next) =>
         const token = req.header('Authorization').replace('Bearer ', '') 
         // check if token is actually valid that created by server and hasn't been expired
         // decoded is the decoded payload (body)and verify the token with the exact secret that generates the token
-        const decoded = jwt.verify(token, 'thisisagreatcourse' )
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
         // if token is valid, we can find the associated user in the db
         // we embed the user's id as part of the token
         // this token is part of user.tokens array. when user logs out, the token should be deleted

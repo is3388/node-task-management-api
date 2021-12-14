@@ -8,7 +8,7 @@ const taskRouter = require('./routers/task')
 const app = express()
 
 //define port 
-const port = process.env.port || 3000
+const port = process.env.PORT 
 
 // set up express middleware which is function that not allow GET request to run route handler
 // express middleware must be the first code before other app.use(). pass in req, res and next to move

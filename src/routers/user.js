@@ -3,6 +3,7 @@ const User = require('../models/user')
 const auth = require('../middleware/auth') //function for authentication
 const multer = require('multer') //upload file
 const sharp = require('sharp') //resize and convert image
+const { sendWelcomeEmail, sendCancelationEmail } = require('../emails/account')
 const router = new express.Router() //create a new router
 
 
@@ -40,6 +41,8 @@ router.post('/users', async (req, res) =>
     const user = new User(req.body)
     try {
             await user.save()
+            // send welcome email
+            sendWelcomeEmail(user.email, user.name)
             // generateAuthToken for the saved user
             const token = await user.generateAuthToken()
             //res.status(201).send(user) //this code run only a promise is fulfilled
@@ -227,6 +230,7 @@ router.delete('/users/me', auth, async ( req, res ) =>
         res.send(user)*/
         // since the user already fetch when doing authentication, use Mongoose method to delete user profile
         await req.user.remove()
+        sendCancelationEmail(req.user.email, req.user.name)
         res.send(req.user) // send back what user is deleted
     }
     catch(e)
@@ -310,6 +314,26 @@ router.get('/users/:id/avatar', async (req, res) =>
         res.status(404).send()
     }
 })
+
+// username and password recovery route
+//Create a password recovery page and route with an input for their email
+
+// When the user clicks on "Forgot your password" send the page.
+
+//When the form is submitted check if a user exists with that email.
+
+// If a user exists then create a new JWT token with the user's ID.
+
+// Send an email with a link in the body that contains the JWT. Something like:
+
+//http://mysite.com/forgot/jwt_token
+// Create another route for that on the server.
+
+// When the request is received, extract the token and grab the ID from it. Look up the up the user by their ID.
+
+// If you find the user then send back a page with two fields to create a new password and confirm it.
+
+// Update the password (don't forget to hash it).
 
 module.exports = router
 
