@@ -1,11 +1,4 @@
-const express = require('express')
-require('./db/mongoose')
-const userRouter = require('./routers/user')
-const taskRouter = require('./routers/task')
-//const User = require('./models/user')
-//const Task = require('./models/task')
-
-const app = express()
+const app = require('./app') // load app.js to access Express app
 
 //define port 
 const port = process.env.PORT 
@@ -32,12 +25,6 @@ const port = process.env.PORT
      res.status(503).send('The site is currently under maintenace. Please try back soon.')
     
 })*/
-// configure express to auto parse incoming JSON to an object, so that we can access it in request handler
-app.use(express.json())
-
-// register router
-app.use(userRouter)
-app.use(taskRouter)
 
 app.listen(port, () =>
 {

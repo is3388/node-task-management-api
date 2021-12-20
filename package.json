@@ -6,7 +6,11 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "env-cmd -f ./config/dev.env nodemon src/index.js",
-    "db": "C:/Users/Dell8/mongodb/bin/mongod.exe --dbpath=C:/Users/Dell8/mongodb-data"
+    "db": "C:/Users/Dell8/mongodb/bin/mongod.exe --dbpath=C:/Users/Dell8/mongodb-data",
+    "test": "env-cmd -f ./config/test.env jest --watch"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +29,8 @@
   "devDependencies": {
     "body-parser": "^1.19.0",
     "env-cmd": "^10.1.0",
-    "nodemon": "^2.0.15"
+    "jest": "^27.4.5",
+    "nodemon": "^2.0.15",
+    "supertest": "^6.1.6"
   }
 }
